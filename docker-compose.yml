@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  rdb:
+    image: redis
+    container_name: rdb-mmaction2
+    networks:
+      - mmaction2
+  mmaction2:
+    image: phatli/mmaction2:cu111_dev
+    container_name: mmaction2
+    # environment:
+    #   - DISPLAY=${DISPLAY}
+    volumes:
+      # - type: bind
+      #   source: /tmp/.X11-unix
+      #   target: /tmp/.X11-unix
+      # - type: bind
+      #   source: ~/.zsh_history
+      #   target: /home/user/.zsh_history
+      - type: bind
+        source: .
+        target: /home/user/mmaction2
+      - type: bind
+        source: /datasets
+        target: /datasets
+
+    networks:
+      - mmaction2
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    dns:
+      - 8.8.8.8
+    ipc: host
+
+networks:
+  mmaction2:

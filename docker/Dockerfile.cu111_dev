@@ -1,0 +1,22 @@
+FROM phatli/pytorch:190cu111cudnn_dev
+
+RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub 32
+RUN sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
+RUN sudo apt-get update && sudo apt-get install -y git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 ffmpeg \
+    && sudo apt-get clean \
+    && sudo rm -rf /var/lib/apt/lists/*
+
+# Install MMCV
+RUN pip install -U openmim && echo 'eval "$(_MIM_COMPLETE=source_zsh mim)"' >> ~/.zshrc
+SHELL ["/bin/zsh", "-c"]
+# Update the environment variable PATH
+ENV PATH=/home/user/.local/bin:$PATH
+RUN mim install mmengine mmcv mmdet mmpose
+
+
+
+COPY ./entrypoint.sh /
+RUN sudo chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/bin/zsh"]
